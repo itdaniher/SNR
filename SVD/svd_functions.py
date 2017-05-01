@@ -67,7 +67,7 @@ def plot_vector(wave, downsample=1, title="", ax_labels=["",""], trace_labels = 
         for (values, label) in zip(wave, trace_labels):
             plt.plot(values[::downsample], label=label)
     else:
-        plt.plot(wave[::downsample], legend=trace_labels[0])
+        plt.plot(wave[::downsample], label=trace_labels[0])
     ax.set_title(title)
     if trace_labels[0] != "":
         plt.legend()

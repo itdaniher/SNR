@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import pi, sin
 import matplotlib.pyplot as plt
+import random
 
 
 LENGTH_MS = 1000;
@@ -8,15 +9,21 @@ SAMPLING_FREQ = 1000;
 
 
 def signal_function(t):
+    """ Returns values to be used as a signal.
+    """
     return square_signal(t)
     # return sin_signal(t)
 
 def sin_signal(t):
+    """ Returns values of many sin waves.
+    """
     # return np.sin(50*t) + np.sin(20*t) + np.sin(12*t) + np.sin(60*t)
     return sin(10*t)
 
 def square_signal(t, clock_ms=100, sampling_freq=SAMPLING_FREQ):
-    data = [1,0,0,1,0,0,1,0,1,1,1]
+    """ Returns a square signal.
+    """
+    data = [1,0,1,1,0,1,1,1,0,1]
 
     num_samples_per_bit = int((clock_ms/1000) * sampling_freq)
     data_stream = np.repeat(data, (num_samples_per_bit,))
@@ -24,6 +31,9 @@ def square_signal(t, clock_ms=100, sampling_freq=SAMPLING_FREQ):
 
 
 def signal_list(length_ms=LENGTH_MS, sampling_freq=SAMPLING_FREQ, signal_func=None):
+    """ Returns a list of values of signal_func. (By default signal_function)
+    """
+
     if signal_func is None:
         signal_func = signal_function
 
@@ -40,12 +50,14 @@ def noise(length):
     return (np.random.random(length) * 2) - 1
 
 def signal_noise(sn_ratio = 1, length_ms=LENGTH_MS, sampling_freq=SAMPLING_FREQ):
+    """ Returns two lists, clean signal and signal with noise.
+    """
     signal = signal_list(length_ms, sampling_freq)
     noisy_signal = signal + (noise(len(signal)) * sn_ratio)
     return signal, noisy_signal
 
 def plot_vector(wave, downsample=1, title="", ax_labels=["",""]):
-    """ Makes a plot of anything you give it.
+    """ Makes a plot of a vector or list of vectors.
     """
     fig, ax = plt.subplots()
     if type(wave) is list:
@@ -60,10 +72,15 @@ def plot_vector(wave, downsample=1, title="", ax_labels=["",""]):
     plt.show()
 
 def mean_squared_error(a, b):
+    """ Compares two lists with MSE.
+    """
     len_to_compare = min(len(a), len(b))
     return ((a[:len_to_compare] - b[:len_to_compare])**2).mean(axis=None)
 
 def partition_vector(input_vector, window_size, step_size=1):
+    """ Partitions a vector into a matrix by sliding a window of window size over it, with a step of step_size.
+        Cuts off non-divisible values of input_vector.
+    """
     if(len(input_vector) < window_size):
         raise ValueError("Input vecor is smaller than window size", len(input_vector, window_size))
 
@@ -78,9 +95,15 @@ def partition_vector(input_vector, window_size, step_size=1):
     return out_matrix
 
 
-def svd_filter(input_matrix, num_terms=1):
-    # print(input_matrix, "\n")
-    U, s, V = np.linalg.svd(input_matrix)
+def svd_filter(input_vector, window_size, step_size=1, num_terms=1):
+    """ Returns a vector filtered by svd. It partitions the input, takes num_terms largest svd values,
+        then unpartitions the resulting matrix into a filtered vector.
+    """
+
+    svd_input = partition_vector(input_vector, window_size, step_size)
+
+    # print(svd_input, "\n")
+    U, s, V = np.linalg.svd(svd_input)
     # print(U,"\n")
     # print(s,"\n")
     # print(V,"\n")
@@ -102,4 +125,5 @@ def svd_filter(input_matrix, num_terms=1):
     # print(output_matrix)
 
     output_vector = np.append(output_matrix[:-1,0], output_matrix[-1, :])
+
     return output_vector

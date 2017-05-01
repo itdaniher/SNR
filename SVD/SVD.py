@@ -15,4 +15,4 @@ print(mean_squared_error(signal, noisy_signal))
 print(mean_squared_error(signal, svd_filtered))
 
 # Plot all vectors
-plot_vector([noisy_signal, svd_filtered, signal])
+plot_vector([noisy_signal, svd_filtered, signal], trace_labels=['noisy', 'filtered', 'original'])

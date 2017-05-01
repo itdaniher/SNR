@@ -56,17 +56,21 @@ def signal_noise(sn_ratio = 1, length_ms=LENGTH_MS, sampling_freq=SAMPLING_FREQ)
     noisy_signal = signal + (noise(len(signal)) * sn_ratio)
     return signal, noisy_signal
 
-def plot_vector(wave, downsample=1, title="", ax_labels=["",""]):
+def plot_vector(wave, downsample=1, title="", ax_labels=["",""], trace_labels = [""]):
     """ Makes a plot of a vector or list of vectors.
     """
     fig, ax = plt.subplots()
     if type(wave) is list:
+        if len(trace_labels) < len(wave):
+            trace_labels *= len(wave)
         print("Plotting", len(wave), "vectors")
-        for values in wave:
-            plt.plot(values[::downsample])
+        for (values, label) in zip(wave, trace_labels):
+            plt.plot(values[::downsample], label=label)
     else:
-        plt.plot(wave[::downsample])
+        plt.plot(wave[::downsample], legend=trace_labels[0])
     ax.set_title(title)
+    if trace_labels[0] != "":
+        plt.legend()
     ax.set_xlabel(ax_labels[0])
     ax.set_ylabel(ax_labels[1])
     plt.show()
